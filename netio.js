@@ -1,81 +1,61 @@
-		function toggle_light(port) {
-			$.ajax({
-				url: 'netio.php?action=toggle&port='+port,
-				async: false,
-				success: function(data) {
-					reload_lightstatus(port);
-				}
-			});
-		};
+/*
+ * Define the NetIO-Class
+ *
+ */
+function netIOClass(provider,device) {
+    this.maxport = 4;
+	this.provider = provider;
+	this.device = device;
 
-		function set_light(port,value) {
-			$.ajax({
-				url: 'netio.php?action=set&port='+port+'&value='+value,
-				async: false,
-				success: function(data) {
-					reload_lightstatus(port);
-				}
-			});
-		};
+}
 
-		function queryportname(port) {
-			$.ajax({
-				url: 'netio.php?action=name&port='+port,
-				async: false,
-				success: function(data) {
-    					$('#light'+port).text(data);
-  				}
-			});
-		}
+netIOClass.prototype.toggle_light=function (port, callback) {
+	$.ajax({
+		url: this.provider+'?device='+this.device+'&action=toggle&port='+port,
+		async: false,
+		success: function(data) { callback(data) }
+	});
+}
 
-		function queryportstatus(port) {
-			$.ajax({
-				url: 'netio.php?action=get&port='+port,
-				async: false,
-				success: function(data) {
-    					$('#light'+port).removeClass('redButton');
-					$('#light'+port).removeClass('greenButton');
-					if (data==1) {
-						$('#light'+port).addClass('greenButton');
-					} else {
-						$('#light'+port).addClass('redButton');
-					}
-  				}
-			});
-		}
+netIOClass.prototype.set_light=function (port,value,callback) {
+	$.ajax({
+		url: this.provider+'?device='+this.device+'&action=set&port='+port+'&value='+value,
+		async: false,
+		success: function(data) { callback(data) }
+	});
+}
 
-		function reload_lightstatus(port) {
-			queryportname(port);
-			queryportstatus(port);
-		}
+netIOClass.prototype.getPortName=function (port,callback) {
+	$.ajax({
+		url: this.provider+'?device='+this.device+'&action=name&port='+port,
+		async: false,
+		success: function(data) { callback(data) }
+	});
+}
 
-		function all_on() {
-			set_light(1,1);
-			set_light(2,1);
-			set_light(3,1);
-			set_light(4,1);
-			reload_lightstatus(1);
-			reload_lightstatus(2);
-			reload_lightstatus(3);
-			reload_lightstatus(4);
-		}
+netIOClass.prototype.getPortOnOff=function (port,callback) {
+	$.ajax({
+		url: this.provider+'?device='+this.device+'&action=get&port='+port,
+		async: false,
+		success: function(data) { callback(data) }
+	});
+}
 
-		function all_off() {
-			set_light(1,0);
-			set_light(2,0);
-			set_light(3,0);
-			set_light(4,0);
-			reload_lightstatus(1);
-			reload_lightstatus(2);
-			reload_lightstatus(3);
-			reload_lightstatus(4);
-		}
+netIOClass.prototype.allOn = function() {
+	for (var port=1;port<=this.maxport;port++) {
+			this.set_light(port,1,function(data) {});
+    }
+}
 
-		function periodic_reload(time) {
-			reload_lightstatus(1);
-			reload_lightstatus(2);
-			reload_lightstatus(3);
-			reload_lightstatus(4);
-			setTimeout("periodic_reload()",time);
-		}
+netIOClass.prototype.allOff =function() {
+	for (var port=1;port<=this.maxport;port++) {
+			this.set_light(port,0,function(data) {});
+    }
+}
+
+netIOClass.prototype.queryportname=function(port,item) {
+    this.getPortName(port,function(data) { $('#'+item).text(data); });
+}
+
+netIO=new netIOClass('netio.php','netio01');
 

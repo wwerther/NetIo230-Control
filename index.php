@@ -17,37 +17,74 @@
 			statusBar: 'black',
 		});
 
-		$(document).ready(function () {
 
+        function toggle_light(port) {
+            netIO.toggle_light(port,function(data) {queryportstatus(port);});
+        }
+
+        function statusupdate() {
+            for (var port=1;port<=netIO.maxport;port++) {
+                queryportstatus(port);
+            }
+        }
+
+        function nameupdate() {
+			for (var port=1;port<=netIO.maxport;port++) {
+				netIO.queryportname(port,'light'+port)
+			}
+        }
+
+        function queryportstatus(port) {
+            netIO.getPortOnOff(port,function(data) {
+                $('#light'+port).removeClass('redButton');
+	    		$('#light'+port).removeClass('greenButton');
+    			if (data==1) {
+    			    $('#light'+port).addClass('greenButton');
+    			} else {
+    			    $('#light'+port).addClass('redButton');
+			    }
+  			});
+        }
+
+    
+        $(document).ready(function () {
+            nameupdate();
+            statusupdate();
+			/*
 			reload_lightstatus(1);
 			reload_lightstatus(2);
 			reload_lightstatus(3);
 			reload_lightstatus(4);
+			 */
 
-			setTimeout("periodic_reload(3000)",3000);
-
-			$('#light1').bind('click',function() {
-					toggle_light(1);
-			});
-
-			$('#light2').bind('click',function() {
-					toggle_light(2);
-			});
-
-			$('#light3').bind('click',function() {
-					toggle_light(3);
-			});
-
-			$('#light4').bind('click',function() {
-					toggle_light(4);
-			});
+            $('#light1').bind('click',function() {
+                toggle_light(1);
+            });
+            $('#light2').bind('click',function() {
+                toggle_light(2);
+            });
+            $('#light3').bind('click',function() {
+                toggle_light(3);
+            });
+            $('#light4').bind('click',function() {
+                toggle_light(4);
+            });
 
 			$('#allon').bind('click',function() {
-					all_on();
-			});
+                netIO.allOn();
+                statusupdate();
+            });
+
 			$('#alloff').bind('click',function() {
-					all_off();
-			});
+				netIO.allOff();
+                statusupdate();
+            });
+
+            /* Do an update on the status every 10 seconds */
+            setInterval("statusupdate()",10000);
+
+            /* Do the update on the names every 60 seconds */
+            setInterval("nameupdate()",60000);
 		});
 	</script>
 	<style type="text/css">
@@ -68,41 +105,59 @@
 		<a class="button" href="#about" >About</a>
 	</div>
 	<div class="content">
+    	<h2>Switches</h2>
 		<p>
 			<a id="light1" class="greenButton" href="#" >Light 1</a>
 			<a id="light2" class="greenButton" href="#" >Light 2</a>
 			<a id="light3" class="greenButton"  href="#" >Light 3</a>
 			<a id="light4" class="greenButton" href="#" >Light 4</a>
 		</p>
+    	<h2>Groupcommands</h2>
+    	<ul class="individual">
+    		<li class="arrow"><a id="allon" class="bluebutton" href="#">All on</a></li>
+    		<li class="arrow"><a id="alloff" class="bluebutton" href="#">All off</a></li>
+        </ul>
 	</div>
-	<h2>Navigation</h2>
-	<ul class="individual">
-		<li class="arrow"><a id="allon" class="bluebutton" href="#">All on</a></li>
-		<li class="arrow"><a id="alloff" class="bluebutton" href="#">All off</a></li>
-	</ul>
-	<div class="info">
+<!--	<div class="info">
 		Das ist mein Text
-	</div>
+	</div>-->
 </div>
 
 <div id="about">
 	<div class="toolbar">
-		<a class="button back" href='#' >Zur&uuml;ck</a>
-		<h1>Light-Control</h1>
+		<a class="button back" href='#' >Back</a>
+		<h1>About</h1>
 	</div>
 	<div class="content">
-		<p>Das ist mein About Dialog</p>
+        <h2>Light-Control</h2>
+        <p>
+        Lightcontrol is intended to be used as a small Application to control <a href="http://www.koukaam.se/showproduct.php?article_id=1502" target='_blank'>NetIO230-B</a> devices via your Smartphone.<br/>
+        This software is only for testing purpose. No warranty is given.
+        </p>
+        <h2>About</h2>
+        <p>
+        Author: Walter Werther<br/>
+        Version: v0.5<br/>
+        Source: <a target='_blank' href="https://github.com/wwerther/NetIo230-Control">GitHub WWerther/NetIo230-Control</a><br/>
+        </p>
+        <p>
+            <br/>(c) 2011 Walter Werther
+        </p>
 	</div>
+<!--	<div class="info">
+		Das ist mein Text
+	</div>-->
 </div>
 <div id="settings">
 	<div class="toolbar">
-		<a class="button back" href="#">Zur&uuml;ck</a>
+		<a class="button back" href="#">Back</a>
 		<h1>Settings</h1>
 	</div>
 	<div class="content">
-		<p>Bitte hier die Einstellungen vornehmen</p>
+		<p>Currently this page does not allow to define any settings. This might change in a future version</p>
 		<ul class="edgetoedge">
-			<li class="arrow"><a href="#about">&Uuml;ber...</a></li>
+			<li class="arrow"><a href="#">Device</a></li>
+			<li class="arrow"><a href="#">Names</a></li>
 		</ul>
 	</div>
 </div>

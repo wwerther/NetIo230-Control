@@ -264,6 +264,10 @@ class netio230 {
             throw new netio230exception("socket_create() failed. Reason: ($result) " . socket_strerror(socket_last_error($this->socket)),1);
         }
 
+        $timeout = array('sec'=>0,'usec'=>500000);
+        socket_set_option($this->socket,SOL_SOCKET,SO_RCVTIMEO,$timeout);
+
+
         $result = socket_connect($this->socket, $this->address, $this->port);
         if ($result === false) {
             throw new netio230exception("socket_connect() failed. Reason: ($result) " . socket_strerror(socket_last_error($this->socket)),1);
