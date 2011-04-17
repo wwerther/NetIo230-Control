@@ -1,0 +1,35 @@
+NetIO-230 Control for IPod/IPhone
+=================================
+:Author:    Walter Werther
+:Date:      17.04.2011
+:Revision:  0.5
+
+WARNING: Use this code at your own risk. Currently this is a proof of concept without any security-aspects taken care of
+
+Installation
+------------
+Download all code to your personal webserver and put it in a dedicated folder. You need php-enabled on this server
+
+Modify the username and password in line 479 of netio.php in case you don't use admin/admin for your Net-IO device
+
+Modify the line 68 in netio.js and point to the netio.php controller and add the dns-name or IP-address of your Net-IO device. My current default is netio01.
+
+Usage
+-----
+Open the installation directory in your mobile-safari browser (only needed once). Then click on the button to add the page to your Home-Screen.
+From now on you can simply open the application directly from your Main-Menu without seeing the URL-and status line of your Safari-Browser.
+I'm sorry, but currently this application does not properly render within a normal browser (e.g. Firefox) on your desktop, even though I did not use
+any special-events like "swipe". This might be related with the current use of CSS. Anyway it's easy to debug within FireBug and the click-events are handled properly.
+
+ToDo
+----
+More than I can say....
+* Get it up and running properly with a normal browser
+* Make the "settings" tab not being a dummy anymore
+* Include "security" features to ensure not everyone knowing the URL can control the devices (eg. password-protection)
+* 
+
+Resources
+---------
+* https://github.com/senchalabs/jQTouch
+
