@@ -23,15 +23,23 @@
         }
 
         function statusupdate() {
+            console.log("Starting Statusupdate");
             for (var port=1;port<=netIO.maxport;port++) {
                 queryportstatus(port);
             }
+            /* We better use setTimeout instead of setInterval, to avoid two calls at the same time, the next trigger will be maid if the function has finished */
+            console.log("Statusupdate finished");
+            setTimeout("statusupdate()",10000);
         }
 
         function nameupdate() {
+            console.log("Starting Nameupdate");
 			for (var port=1;port<=netIO.maxport;port++) {
 				netIO.queryportname(port,'light'+port)
 			}
+            /* We better use setTimeout instead of setInterval, to avoid two calls at the same time, the next trigger will be maid if the function has finished */
+            console.log("Nameupdate finished");
+            setTimeout("nameupdate()",60000);
         }
 
         function queryportstatus(port) {
@@ -80,11 +88,6 @@
                 statusupdate();
             });
 
-            /* Do an update on the status every 10 seconds */
-            setInterval("statusupdate()",10000);
-
-            /* Do the update on the names every 60 seconds */
-            setInterval("nameupdate()",60000);
 		});
 	</script>
 	<style type="text/css">

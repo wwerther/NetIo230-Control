@@ -12,6 +12,8 @@ function netIOClass(provider,device) {
 netIOClass.prototype.toggle_light=function (port, callback) {
 	$.ajax({
 		url: this.provider+'?device='+this.device+'&action=toggle&port='+port,
+		cache: false,
+		timeout: 200,
 		async: false,
 		success: function(data) { callback(data) }
 	});
@@ -20,6 +22,8 @@ netIOClass.prototype.toggle_light=function (port, callback) {
 netIOClass.prototype.set_light=function (port,value,callback) {
 	$.ajax({
 		url: this.provider+'?device='+this.device+'&action=set&port='+port+'&value='+value,
+		cache: false,
+		timeout: 200,
 		async: false,
 		success: function(data) { callback(data) }
 	});
@@ -28,6 +32,8 @@ netIOClass.prototype.set_light=function (port,value,callback) {
 netIOClass.prototype.getPortName=function (port,callback) {
 	$.ajax({
 		url: this.provider+'?device='+this.device+'&action=name&port='+port,
+		cache: false,
+		timeout: 200,
 		async: false,
 		success: function(data) { callback(data) }
 	});
@@ -36,6 +42,8 @@ netIOClass.prototype.getPortName=function (port,callback) {
 netIOClass.prototype.getPortOnOff=function (port,callback) {
 	$.ajax({
 		url: this.provider+'?device='+this.device+'&action=get&port='+port,
+		cache: false,
+		timeout: 200,
 		async: false,
 		success: function(data) { callback(data) }
 	});

@@ -258,23 +258,13 @@ class netio230 {
             throw new netio230exception("socket already exists");
         }
 
-        /* Create a TCP/IP socket. */
-        $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if ($this->socket === false) {
-            throw new netio230exception("socket_create() failed. Reason: ($result) " . socket_strerror(socket_last_error($this->socket)),1);
-        }
-
-        $timeout = array('sec'=>0,'usec'=>500000);
-        socket_set_option($this->socket,SOL_SOCKET,SO_RCVTIMEO,$timeout);
-
-
-        $result = socket_connect($this->socket, $this->address, $this->port);
-        if ($result === false) {
-            throw new netio230exception("socket_connect() failed. Reason: ($result) " . socket_strerror(socket_last_error($this->socket)),1);
+        $this->socket = fsockopen($this->address,$this->port,$errno,$errstr,0.30);
+        if ( ! $this->socket ) {
+            throw new netio230exception("problem with tcp connection-attempt. Reason: ($errno) " . $errstr,$errno);
         }
 
         if (! $read = $this->_readmessage()) {
-            throw new netio230exception("problem with tcp connection-attempt. Reason: ($result) " . socket_strerror(socket_last_error($this->socket)),1);
+            throw new netio230exception("problem with first tcp read-attempt. Reason: ($read) " . socket_strerror(socket_last_error($this->socket)),1);
         } else {
 		    $this->_log("Hash: $this->login_hash");
 		    $this->_log("Version: $this->kshell_version");
@@ -431,11 +421,12 @@ class netio230 {
 
         $this->_log("WRITE: ".rtrim($out));
 
-        $result=socket_write($this->socket, $out, strlen($out));
-        if (socket_last_error($this->socket)) {
-            $this->lastrc=-socket_last_error($this->socket);
-            throw new netio230exception('Socket-Write error ('.socket_last_error($this->socket).')'.socket_strerror(socket_last_error($this->socket)),-socket_last_error($this->socket));
-		}
+        fputs ($this->socket,$out);
+#       $result=socket_write($this->socket, $out, strlen($out));
+#       if (socket_last_error($this->socket)) {
+#           $this->lastrc=-socket_last_error($this->socket);
+#           throw new netio230exception('Socket-Write error ('.socket_last_error($this->socket).')'.socket_strerror(socket_last_error($this->socket)),-socket_last_error($this->socket));
+#	}
     }
 
 	private function _readmessage() {
@@ -443,11 +434,11 @@ class netio230 {
             throw new netio230exception("socket not properly opened");
         }
 
-        $in=rtrim(@socket_read($this->socket, 1024));
-        if (socket_last_error($this->socket)) {
-            $this->lastrc=-socket_last_error($this->socket);
-            throw new netioexception('Socket-Read error ('.socket_last_error($this->socket).')'.socket_strerror(socket_last_error($this->socket)),-socket_last_error($this->socket));
-        }
+        $in=rtrim(@fgets($this->socket, 1024));
+#        if (socket_last_error($this->socket)) {
+#            $this->lastrc=-socket_last_error($this->socket);
+#            throw new netioexception('Socket-Read error ('.socket_last_error($this->socket).')'.socket_strerror(socket_last_error($this->socket)),-socket_last_error($this->socket));
+#        }
  
         $this->_log("READ: $in");
 
@@ -484,44 +475,49 @@ class netio230 {
 
 }
 
-$netio = new netio230('netio01','admin','admin');
-$netio->connect();
-#$netio->disconnect();
-#$netio->connect();
-$netio->login();
+try {
+	$netio = new netio230($_GET['device'],'admin','admin');
+	$netio->connect();
+	#$netio->disconnect();
+	#$netio->connect();
+	$netio->login();
 
-#$output = $netio->getPortStatus()."-".$netio->getVersion();
-#$output = $netio->reboot();
-#
-$output = '';
+	#$output = $netio->getPortStatus()."-".$netio->getVersion();
+	#$output = $netio->reboot();
+	#
+	$output = '';
 
-#for ($i=1;$i<=4;$i++) {
-#    $netio->setPortOnOff($i,1-$netio->getPortOnOff($i));
-#    $output.=$netio->getPortName($i).':'.$netio->getPortOnOff($i)."\n";
-#}
-#$output =$netio->getPortOnOff(3,1);
+	#for ($i=1;$i<=4;$i++) {
+	#    $netio->setPortOnOff($i,1-$netio->getPortOnOff($i));
+	#    $output.=$netio->getPortName($i).':'.$netio->getPortOnOff($i)."\n";
+	#}
+	#$output =$netio->getPortOnOff(3,1);
 
-if ($_GET['action']=='name') {
-    $output=$netio->getPortName($_GET['port']);
-    print $output;
+	if ($_GET['action']=='name') {
+	    $output=$netio->getPortName($_GET['port']);
+	    print $output;
+	    exit;
+	}
+	if ($_GET['action']=='get') {
+	    $output=$netio->getPortOnOff($_GET['port']);
+	    print $output;
+	    exit;
+	}
+	if ($_GET['action']=='set') {
+	    $output=$netio->setPortOnOff($_GET['port'],$_GET['value']);
+	    print $output;
+	    exit;
+	}
+	if ($_GET['action']=='toggle') {
+	    $output=$netio->setPortOnOff($_GET['port'],1-$netio->getPortOnOff($_GET['port']));
+	    print $output;
+	    exit;
+    }
+} catch (NetIO230Exception $E) {
+    header("HTTP/1.0 500 $E");
+    print $E;
     exit;
 }
-if ($_GET['action']=='get') {
-    $output=$netio->getPortOnOff($_GET['port']);
-    print $output;
-    exit;
-}
-if ($_GET['action']=='set') {
-    $output=$netio->setPortOnOff($_GET['port'],$_GET['value']);
-    print $output;
-    exit;
-}
-if ($_GET['action']=='toggle') {
-    $output=$netio->setPortOnOff($_GET['port'],1-$netio->getPortOnOff($_GET['port']));
-    print $output;
-    exit;
-}
-
 
 ?>
 <html>
