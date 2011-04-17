@@ -4,7 +4,7 @@ NetIO-230 Control for IPod/IPhone
 :Date:      17.04.2011
 :Revision:  0.5
 
-WARNING: Use this code at your own risk. Currently this is a proof of concept without any security-aspects taken care of
+WARNING: Use this code at your own risk. Currently this is a proof of concept without any security-aspects taken care of.
 
 Installation
 ------------
@@ -24,10 +24,10 @@ any special-events like "swipe". This might be related with the current use of C
 ToDo
 ----
 More than I can say....
-* Get it up and running properly with a normal browser
-* Make the "settings" tab not being a dummy anymore
-* Include "security" features to ensure not everyone knowing the URL can control the devices (eg. password-protection)
-* 
+ * Get it up and running properly with a normal browser
+ * Make the "settings" tab not being a dummy anymore
+ * Include "security" features to ensure not everyone knowing the URL can control the devices (eg. password-protection)
+ * ...
 
 Resources
 ---------
